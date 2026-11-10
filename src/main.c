@@ -28,56 +28,78 @@ int main ()
 	// Load a texture from the resources directory
 	Texture lois = LoadTexture("lois.png");
 
+
 	int lois_x = 0;
 	int lois_y = 0;
 
 	
-	int zellen[(640/32)*(640/32)][(640/32)*(640/32)];
-	for(int i = 0; i<(640/32)*(640/32);i++){
-		for(int j = 0; j<(640/32)*(640/32);j++){
-			if(j!=i){
-				
-			}
-			else zellen[i][j]=0;
-		}
-	}
-	
-	// game loop
-	while (!WindowShouldClose())		// run the loop until the user presses ESCAPE or presses the Close button on the window
+
+	typedef struct edge {
+		//vertices
+		int x_a, y_a;
+		int x_b, y_b;
+		int weight;
+	} edge_t;
+	//list
+	typedef struct node{
+		edge_t;
+		void *next;
+	} node_t;
+
+	node_t adjacency[GetScreenWidth() / 32][GetScreenHeight() / 32];
+	for (int x = 0; x < (GetScreenWidth() / 32); x++)
 	{
-		//update
-		if(IsKeyPressed(KEY_RIGHT)){lois_x = trunc(fmin(lois_x+32,608));}
-		else if(IsKeyPressed(KEY_LEFT)){lois_x = trunc(fmax(lois_x - 32,0));}
-		else if(IsKeyPressed(KEY_UP)){lois_y = trunc(fmax(lois_y - 32,0));}
-		else if(IsKeyPressed(KEY_DOWN)){lois_y = trunc(fmin(lois_y+32,608));}
-
-		// drawing
-		BeginDrawing();
-
-		// Setup the back buffer for drawing (clear color and depth buffers)
-		ClearBackground(WHITE);
-
-		// draw some text using the default font
-		// DrawText("Hello Louis", 200,200,20,WHITE);
-
-		// draw our texture to the screen
-		
-		DrawTexture(lois, lois_x, lois_y, WHITE);
-		
-		for (int x = 0; x < 21; x++)
-		{
-			DrawLine(x * 32, 0, x * 32, 640, BLACK);
+		for (int y = 0; y < (GetScreenHeight() / 32);y++){
+			 
 		}
-		for(int y = 0; y < 21; y++)
-		{
-			DrawLine(0, y * 32, 640, y * 32, BLACK);
-		}
-
-		
-
-		// end the frame and get ready for the next one  (display frame, poll input, etc...)
-		EndDrawing();
 	}
+
+		// game loop
+		while (!WindowShouldClose()) // run the loop until the user presses ESCAPE or presses the Close button on the window
+		{
+			// update
+			if (IsKeyPressed(KEY_RIGHT))
+			{
+				lois_x = trunc(fmin(lois_x + 32, GetScreenWidth() - 32));
+			}
+			else if (IsKeyPressed(KEY_LEFT))
+			{
+				lois_x = trunc(fmax(lois_x - 32, 0));
+			}
+			else if (IsKeyPressed(KEY_UP))
+			{
+				lois_y = trunc(fmax(lois_y - 32, 0));
+			}
+			else if (IsKeyPressed(KEY_DOWN))
+			{
+				lois_y = trunc(fmin(lois_y + 32, GetScreenHeight() - 32));
+			}
+
+			// drawing
+			BeginDrawing();
+
+			// Setup the back buffer for drawing (clear color and depth buffers)
+			ClearBackground(WHITE);
+
+			// draw some text using the default font
+			// DrawText("Hello Louis", 200,200,20,WHITE);
+
+			// draw our texture to the screen
+
+			DrawTexture(lois, lois_x, lois_y, WHITE);
+
+			for (int x = 0; x < 21; x++)
+			{
+				DrawLine(x * 32, 0, x * 32, 640, BLACK);
+			}
+			for (int y = 0; y < 21; y++)
+			{
+				DrawLine(0, y * 32, 640, y * 32, BLACK);
+			}
+
+			// end the frame and get ready for the next one  (display frame, poll input, etc...)
+			EndDrawing();
+		}
 
 	// cleanup
 	// unload our texture so it can be cleaned up
