@@ -8,18 +8,19 @@ by Jeffery Myers is marked with CC0 1.0. To view a copy of this license, visit h
 */
 
 #include "raylib.h"
-
+#include <stdio.h>
 #include "resource_dir.h"	// utility header for SearchAndSetResourceDir
 #include <rlgl.h>
 #include <math.h>
 
 int main ()
 {
+
 	// Tell the window to use vsync and work on high DPI displays
 	SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
 
 	// Create the window and OpenGL context
-	InitWindow(640, 640, "mazewald");
+	InitWindow(640, 640, "grünenschmalz");
 
 	// Utility function from resource_dir.h to find the resources folder and set it as the current working directory so we can load from it
 	SearchAndSetResourceDir("resources");
@@ -30,16 +31,25 @@ int main ()
 	int lois_x = 0;
 	int lois_y = 0;
 
-
-
+	
+	int zellen[(640/32)*(640/32)][(640/32)*(640/32)];
+	for(int i = 0; i<(640/32)*(640/32);i++){
+		for(int j = 0; j<(640/32)*(640/32);j++){
+			if(j!=i){
+				
+			}
+			else zellen[i][j]=0;
+		}
+	}
+	
 	// game loop
 	while (!WindowShouldClose())		// run the loop until the user presses ESCAPE or presses the Close button on the window
 	{
 		//update
 		if(IsKeyPressed(KEY_RIGHT)){lois_x = trunc(fmin(lois_x+32,608));}
-		if(IsKeyPressed(KEY_LEFT)){lois_x = trunc(fmax(lois_x - 32,0));}
-		if(IsKeyPressed(KEY_UP)){lois_y = trunc(fmax(lois_y - 32,0));}
-		if(IsKeyPressed(KEY_DOWN)){lois_y = trunc(fmin(lois_y+32,608));}
+		else if(IsKeyPressed(KEY_LEFT)){lois_x = trunc(fmax(lois_x - 32,0));}
+		else if(IsKeyPressed(KEY_UP)){lois_y = trunc(fmax(lois_y - 32,0));}
+		else if(IsKeyPressed(KEY_DOWN)){lois_y = trunc(fmin(lois_y+32,608));}
 
 		// drawing
 		BeginDrawing();
