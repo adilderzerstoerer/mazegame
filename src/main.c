@@ -4,9 +4,12 @@
 #include <rlgl.h>
 #include <math.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
-int window_height = 640;
-int window_width = 640;
+#define push(sp, n) (*((sp)++) = (n))
+#define pop(sp) (*--(sp))
+#define HEIGHT 640
+#define WIDTH 640
 
 int lois_x = 0;
 int lois_y = 0;
@@ -28,7 +31,6 @@ node_t* return_all_neighbours(int x, int y){
 	node_t* head = 0;
 	node_t *current = 0;
 	
-
 	if (x != 0)
 	{
 		// (x-1,y)
@@ -56,7 +58,7 @@ node_t* return_all_neighbours(int x, int y){
 		}
 		current->edge = edge;
 	}
-	if(y<=(window_height-32)/32){
+	if(y<=(HEIGHT-32)/32){
 		// (x,y+1)
 		edge_t *edge = malloc(sizeof(edge_t));
 		*edge = (edge_t){.x_a = x, .y_a = y, .x_b = x, .y_b = y+1,.weight = NULL, .id = 0};
@@ -69,7 +71,7 @@ node_t* return_all_neighbours(int x, int y){
 		}
 		current->edge = edge;
 	}
-	if(x<=(window_width-32)/32){
+	if(x<=(WIDTH-32)/32){
 		// (x+1,y)
 		edge_t *edge = malloc(sizeof(edge_t));
 		*edge = (edge_t){.x_a = x, .y_a = y, .x_b = x + 1, .y_b = y,.weight = NULL, .id = 0};
@@ -86,6 +88,8 @@ node_t* return_all_neighbours(int x, int y){
 	return head;
 }
 
+
+
 int main ()
 {
 
@@ -94,7 +98,7 @@ int main ()
 
 	// Create the window and OpenGL context
 	
-	InitWindow(window_width,window_height, "grünenschmalz");
+	InitWindow(WIDTH,HEIGHT, "grünenschmalz");
 
 	// Utility function from resource_dir.h to find the resources folder and set it as the current working directory so we can load from it
 	SearchAndSetResourceDir("resources");
@@ -102,21 +106,27 @@ int main ()
 	// Load a texture from the resources directory
 	Texture lois = LoadTexture("lois.png");
 
+	bool visited[WIDTH / 32][HEIGHT / 32];
+	for (int x = 0; x < (WIDTH / 32); x++){
+		for(int y = 0; y < (HEIGHT / 32); y++){
+			visited[x][y] = false;
+		}
+	}
 
-	node_t* adjacency[window_width / 32][window_height / 32];
-	for (int x = 0; x < (window_width / 32); x++)
+	node_t *adjacency[WIDTH / 32][HEIGHT / 32];
+	for (int x = 0; x < (WIDTH / 32); x++)
 	{
-		for (int y = 0; y < (window_height / 32);y++){
+		for (int y = 0; y < (HEIGHT / 32);y++){
 			adjacency[x][y] = return_all_neighbours(x, y);
 		}
 	}
 
 	//set weights, identify the edges that are double
 	int i = 1;
-	for (int x = 0; x < (window_width / 32); x++)
+	for (int x = 0; x < (WIDTH / 32); x++)
 	{
 		
-		for (int y = 0; y < (window_height / 32);y++){
+		for (int y = 0; y < (HEIGHT / 32);y++){
 			node_t *current = adjacency[x][y];
 			int *r = calloc(sizeof(int), 1);
 			
@@ -146,6 +156,9 @@ int main ()
 		}
 	}	
 	
+	//create minimal spanningtree
+
+
 
 
 		// game loop
@@ -154,7 +167,7 @@ int main ()
 			// update
 			if (IsKeyPressed(KEY_RIGHT))
 			{
-				lois_x = trunc(fmin(lois_x + 32, window_width - 32));
+				lois_x = trunc(fmin(lois_x + 32, WIDTH - 32));
 			}
 			else if (IsKeyPressed(KEY_LEFT))
 			{
@@ -166,7 +179,7 @@ int main ()
 			}
 			else if (IsKeyPressed(KEY_DOWN))
 			{
-				lois_y = trunc(fmin(lois_y + 32, window_height - 32));
+				lois_y = trunc(fmin(lois_y + 32, HEIGHT - 32));
 			}
 
 			// drawing
