@@ -12,6 +12,87 @@ by Jeffery Myers is marked with CC0 1.0. To view a copy of this license, visit h
 #include "resource_dir.h"	// utility header for SearchAndSetResourceDir
 #include <rlgl.h>
 #include <math.h>
+#include <stdlib.h>
+
+int window_height = 640;
+int window_width = 640;
+
+int lois_x = 0;
+int lois_y = 0;
+
+typedef struct edge {
+		//vertices
+		int x_a, y_a;
+		int x_b, y_b;
+		int weight;
+	} edge_t;
+	//list
+	typedef struct node{
+		edge_t *edge;
+		struct node *next;
+	} node_t;
+
+node_t* return_all_neighbours(int x, int y){
+	node_t* head = 0;
+	node_t *current = 0;
+	
+
+	if (x != 0)
+	{
+		// (x-1,y)
+		edge_t *edge = malloc(sizeof(edge_t));
+		*edge = (edge_t){.x_a = x, .y_a = y, .x_b = x -1, .y_b = y,.weight = 0};
+		if(current) {
+    		current->next = calloc(sizeof(node_t),1);
+    		current = current->next;
+		} else {
+    		current = calloc(sizeof(node_t),1);
+    		head = current;
+		}
+		current->edge = edge;
+	}
+	if(y!=0){
+		// (x,y-1)
+		edge_t *edge = malloc(sizeof(edge_t));
+		*edge = (edge_t){.x_a = x, .y_a = y, .x_b = x, .y_b = y-1,.weight = 0};
+		if(current) {
+    		current->next = calloc(sizeof(node_t),1);
+    		current = current->next;
+		} else {
+    		current = calloc(sizeof(node_t),1);
+    		head = current;
+		}
+		current->edge = edge;
+	}
+	if(y<=(window_height-32)/32){
+		// (x,y+1)
+		edge_t *edge = malloc(sizeof(edge_t));
+		*edge = (edge_t){.x_a = x, .y_a = y, .x_b = x, .y_b = y+1,.weight = 0};
+		if(current) {
+    		current->next = calloc(sizeof(node_t),1);
+    		current = current->next;
+		} else {
+    		current = calloc(sizeof(node_t),1);
+    		head = current;
+		}
+		current->edge = edge;
+	}
+	if(x<=(window_width-32)/32){
+		// (x+1,y)
+		edge_t *edge = malloc(sizeof(edge_t));
+		*edge = (edge_t){.x_a = x, .y_a = y, .x_b = x + 1, .y_b = y,.weight = 0};
+		if(current) {
+    		current->next = calloc(sizeof(node_t),1);
+    		current = current->next;
+		} else {
+    		current = calloc(sizeof(node_t),1);
+    		head = current;
+		}
+		current->edge = edge;
+	}
+	
+	return head;
+}
 
 int main ()
 {
@@ -20,7 +101,8 @@ int main ()
 	SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
 
 	// Create the window and OpenGL context
-	InitWindow(640, 640, "grünenschmalz");
+	
+	InitWindow(window_width,window_height, "grünenschmalz");
 
 	// Utility function from resource_dir.h to find the resources folder and set it as the current working directory so we can load from it
 	SearchAndSetResourceDir("resources");
@@ -29,30 +111,24 @@ int main ()
 	Texture lois = LoadTexture("lois.png");
 
 
-	int lois_x = 0;
-	int lois_y = 0;
-
-	
-
-	typedef struct edge {
-		//vertices
-		int x_a, y_a;
-		int x_b, y_b;
-		int weight;
-	} edge_t;
-	//list
-	typedef struct node{
-		edge_t;
-		void *next;
-	} node_t;
-
-	node_t adjacency[GetScreenWidth() / 32][GetScreenHeight() / 32];
-	for (int x = 0; x < (GetScreenWidth() / 32); x++)
+	node_t* adjacency[window_width / 32][window_height / 32];
+	for (int x = 0; x < (window_width / 32); x++)
 	{
-		for (int y = 0; y < (GetScreenHeight() / 32);y++){
-			 
+		for (int y = 0; y < (window_height / 32);y++){
+			adjacency[x][y] = return_all_neighbours(x, y);
 		}
 	}
+
+	//set weights, identify the edges that are double
+	for (int x = 0; x < (window_width / 32); x++)
+	{
+		for (int y = 0; y < (window_height / 32);y++){
+			struct node *current = adjacency[x][y];
+			
+		}
+	}	
+
+
 
 		// game loop
 		while (!WindowShouldClose()) // run the loop until the user presses ESCAPE or presses the Close button on the window
@@ -60,7 +136,7 @@ int main ()
 			// update
 			if (IsKeyPressed(KEY_RIGHT))
 			{
-				lois_x = trunc(fmin(lois_x + 32, GetScreenWidth() - 32));
+				lois_x = trunc(fmin(lois_x + 32, window_width - 32));
 			}
 			else if (IsKeyPressed(KEY_LEFT))
 			{
@@ -72,7 +148,7 @@ int main ()
 			}
 			else if (IsKeyPressed(KEY_DOWN))
 			{
-				lois_y = trunc(fmin(lois_y + 32, GetScreenHeight() - 32));
+				lois_y = trunc(fmin(lois_y + 32, window_height - 32));
 			}
 
 			// drawing
@@ -109,3 +185,4 @@ int main ()
 	CloseWindow();
 	return 0;
 }
+
