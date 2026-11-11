@@ -24,8 +24,9 @@ typedef struct edge {
 		//vertices
 		int x_a, y_a;
 		int x_b, y_b;
-		int weight;
-	} edge_t;
+		int* weight;
+		int id;
+} edge_t;
 	//list
 	typedef struct node{
 		edge_t *edge;
@@ -41,7 +42,7 @@ node_t* return_all_neighbours(int x, int y){
 	{
 		// (x-1,y)
 		edge_t *edge = malloc(sizeof(edge_t));
-		*edge = (edge_t){.x_a = x, .y_a = y, .x_b = x -1, .y_b = y,.weight = 0};
+		*edge = (edge_t){.x_a = x, .y_a = y, .x_b = x -1, .y_b = y,.weight = NULL, .id = 0};
 		if(current) {
     		current->next = calloc(sizeof(node_t),1);
     		current = current->next;
@@ -54,7 +55,7 @@ node_t* return_all_neighbours(int x, int y){
 	if(y!=0){
 		// (x,y-1)
 		edge_t *edge = malloc(sizeof(edge_t));
-		*edge = (edge_t){.x_a = x, .y_a = y, .x_b = x, .y_b = y-1,.weight = 0};
+		*edge = (edge_t){.x_a = x, .y_a = y, .x_b = x, .y_b = y-1,.weight = NULL, .id = 0};
 		if(current) {
     		current->next = calloc(sizeof(node_t),1);
     		current = current->next;
@@ -67,7 +68,7 @@ node_t* return_all_neighbours(int x, int y){
 	if(y<=(window_height-32)/32){
 		// (x,y+1)
 		edge_t *edge = malloc(sizeof(edge_t));
-		*edge = (edge_t){.x_a = x, .y_a = y, .x_b = x, .y_b = y+1,.weight = 0};
+		*edge = (edge_t){.x_a = x, .y_a = y, .x_b = x, .y_b = y+1,.weight = NULL, .id = 0};
 		if(current) {
     		current->next = calloc(sizeof(node_t),1);
     		current = current->next;
@@ -80,7 +81,7 @@ node_t* return_all_neighbours(int x, int y){
 	if(x<=(window_width-32)/32){
 		// (x+1,y)
 		edge_t *edge = malloc(sizeof(edge_t));
-		*edge = (edge_t){.x_a = x, .y_a = y, .x_b = x + 1, .y_b = y,.weight = 0};
+		*edge = (edge_t){.x_a = x, .y_a = y, .x_b = x + 1, .y_b = y,.weight = NULL, .id = 0};
 		if(current) {
     		current->next = calloc(sizeof(node_t),1);
     		current = current->next;
@@ -120,14 +121,40 @@ int main ()
 	}
 
 	//set weights, identify the edges that are double
+	int i = 1;
 	for (int x = 0; x < (window_width / 32); x++)
 	{
+		
 		for (int y = 0; y < (window_height / 32);y++){
-			struct node *current = adjacency[x][y];
+			node_t *current = adjacency[x][y];
+			int *r = calloc(sizeof(int), 1);
 			
+			*r = rand() % 10;
+			if (current->edge->weight == NULL)
+			{
+				int *x_a = &current->edge->x_a;
+				int *x_b = &current->edge->x_b;
+				int *y_a = &current->edge->y_a;
+				int *y_b = &current->edge->y_b;
+				node_t *traverse = adjacency[*x_b][*y_b];
+				while(traverse){
+					if(traverse->edge->weight == NULL){
+						if(traverse->edge->x_a == *x_b && traverse->edge->y_a == *y_b && traverse->edge->x_a == *x_b && traverse->edge->y_b == *y_a){
+							(traverse->edge->weight) = r;
+							(current->edge->weight) = r;
+							(current->edge->id) = i;
+							(traverse->edge->id) = i;
+							i = i + 1;
+							break;
+						}
+					}
+					traverse = traverse->next;
+				}
+			
+			}
 		}
 	}	
-
+	
 
 
 		// game loop
